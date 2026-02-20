@@ -1,43 +1,17 @@
 {
-  "name": "local_instagram",
+  "name": "instagram-web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "server": "nodemon src/Backend/app.js",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "axios": "^1.1.3",
-    "body-parser": "^1.20.1",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "express-mysql-session": "^2.1.8",
-    "express-session": "^1.17.3",
-    "fs": "^0.0.1-security",
-    "meta": "^2.2.25",
-    "multer": "^1.4.5-lts.1",
-    "mysql2": "^2.3.3",
-    "nodemon": "^2.0.20",
-    "path": "^0.12.7",
-    "sass": "^1.56.1",
-    "si-grenoble": "^0.6.0",
-    "socket.io": "^4.5.4",
-    "socket.io-client": "^4.5.4",
-    "swiper": "^8.4.5",
-    "uuid": "^9.0.0",
-    "vue": "^3.2.41",
-    "vue-cookies": "^1.8.2",
-    "vue-router": "^4.1.6",
-    "vue-session": "^1.0.0",
-    "vuex": "^4.1.0"
+    "dev": "concurrently \"pnpm dev:api\" \"pnpm dev:web\"",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm --filter web build && pnpm --filter api build",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.2.0",
-    "vite": "^3.2.3"
+    "concurrently": "^9.1.0"
   }
 }
