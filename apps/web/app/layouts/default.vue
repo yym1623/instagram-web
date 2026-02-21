@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Menu from '~/components/Menu.vue'
-import { useAuthStore } from '~/stores/auth'
+import Menu from '@/app/components/Menu.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const route = useRoute()

@@ -3,17 +3,17 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { FreeMode } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/free-mode'
+import { useAuthStore } from '@/stores/auth'
+import { useApi } from '@/app/composables/useApi'
+import type { UserLite } from '@/app/data/mock'
 
-interface UserLite {
-  id: string
-  name: string
-  nickname: string
-}
-
-const props = defineProps<{
-  open: boolean
-  users: UserLite[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    mockUsers?: UserLite[]
+  }>(),
+  { mockUsers: () => [] },
+)
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -21,12 +21,32 @@ const emit = defineEmits<{
   (e: 'selectUser', user: UserLite): void
 }>()
 
+const auth = useAuthStore()
+const { post } = useApi()
+const usersList = ref<UserLite[]>([])
 const searchQuery = ref('')
+
+async function loadUsers() {
+  try {
+    const res = (await post('/users/select', { name: auth.name })) as UserLite[] | null
+    if (res && Array.isArray(res) && res.length > 0) {
+      usersList.value = res
+    } else {
+      usersList.value = props.mockUsers
+    }
+  } catch {
+    usersList.value = props.mockUsers
+  }
+}
+
+watch(() => props.open, (open) => {
+  if (open) loadUsers()
+})
 
 const filteredUsers = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
-  if (!q) return props.users
-  return props.users.filter(
+  if (!q) return usersList.value
+  return usersList.value.filter(
     (u) =>
       u.name.toLowerCase().includes(q) || u.nickname.toLowerCase().includes(q),
   )

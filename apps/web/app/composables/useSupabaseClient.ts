@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { createSupabaseClient } from '~/lib/supabase/client'
-import { createSupabaseServerClient } from '~/lib/supabase/server'
+import { createSupabaseClient } from '@/app/lib/supabase/client'
+import { createSupabaseServerClient } from '@/app/lib/supabase/server'
 
 let _client: SupabaseClient | null = null
 

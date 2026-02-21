@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{
   open: boolean
@@ -169,6 +169,7 @@ async function share() {
     files.value.forEach(({ file }) => {
       formData.append('myfile', file)
     })
+    formData.append('user_id', auth.id)
     formData.append('email', auth.email)
     formData.append('name', auth.name)
     formData.append('nickname', auth.nickname)

@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import { useApi } from '~/composables/useApi'
-
-interface CommentItem {
-  id: string
-  make_id: string
-  user_nickname: string
-  comment: string
-}
+import { useApi } from '@/app/composables/useApi'
+import type { MockFeedComment } from '@/app/data/mock'
 
 interface PostDetail {
   id: string
@@ -21,32 +15,67 @@ const props = withDefaults(
   defineProps<{
     open: boolean
     post: PostDetail | null
-    comments: CommentItem[]
+    comments: MockFeedComment[]
     comment: string
     liked?: boolean
     likeCount?: number
+    /** 현재 유저가 좋아요 누른 댓글 id 목록 (표시용) */
+    likedCommentIds?: string[]
   }>(),
-  { liked: false, likeCount: 0 },
+  { liked: false, likeCount: 0, likedCommentIds: () => [] },
 )
 
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'update:comment', value: string): void
   (e: 'submitComment', postId: string): void
+  (e: 'addReply', parentCommentId: string, text: string): void
+  (e: 'toggleCommentLike', commentId: string): void
+  (e: 'toggleLike'): void
   (e: 'openProfile', name: string): void
   (e: 'msgPage'): void
 }>()
 
+const likedSet = computed(() => new Set(props.likedCommentIds ?? []))
+
+function displayLikeCount(c: MockFeedComment) {
+  return (c.like ?? 0) + (likedSet.value.has(c.id) ? 1 : 0)
+}
+
+function isLiked(c: MockFeedComment) {
+  return likedSet.value.has(c.id)
+}
+
+const replyingToId = ref<string | null>(null)
+const replyText = ref('')
+
+function startReply(commentId: string) {
+  replyingToId.value = commentId
+  replyText.value = ''
+}
+
+function submitReply() {
+  const parentId = replyingToId.value
+  const text = replyText.value.trim()
+  if (parentId && text) {
+    emit('addReply', parentId, text)
+    replyingToId.value = null
+    replyText.value = ''
+  }
+}
+
+function cancelReply() {
+  replyingToId.value = null
+  replyText.value = ''
+}
+
 const { imageUrl } = useApi()
 
-const hasImages = computed(
-  () =>
-    (props.post?.img_cnt ?? 0) > 0 && (props.post?.img ?? '').length > 0,
-)
-const isSingleImage = computed(() => (props.post?.img_cnt ?? 0) === 1)
 const imageList = computed(() =>
   (props.post?.img ?? '').split(',').filter(Boolean),
 )
+const hasImages = computed(() => imageList.value.length > 0)
+const isSingleImage = computed(() => imageList.value.length === 1)
 
 const imageIndex = ref(0)
 
@@ -54,6 +83,10 @@ watch(
   () => props.open,
   (v) => {
     if (v) imageIndex.value = 0
+    if (!v) {
+      replyingToId.value = null
+      replyText.value = ''
+    }
   },
 )
 </script>
@@ -62,7 +95,7 @@ watch(
   <Teleport to="body">
     <div
       v-if="open && post"
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/25 p-4"
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/25 overflow-auto"
       @click.self="emit('close')"
     >
       <div class="bg-[rgb(33,35,40)] rounded-b-xl shadow-2xl w-[90vw] max-w-[950px] h-[90vh] flex overflow-hidden border border-neutral-700 flex-col lg:flex-row">
@@ -132,46 +165,123 @@ watch(
             </button>
           </div>
 
-          <!-- 댓글 스크롤 영역: 캡션 + 댓글 목록(프로필, 유저명, 댓글, 시간, 좋아요/답글, 하트) -->
+          <!-- 댓글 스크롤 영역: 댓글 + 대댓글, 좋아요/답글 달기 (목데이터 구조 반영) -->
           <div class="flex-1 overflow-y-auto min-h-0 px-4 py-3">
-            <div
-              v-for="c in comments"
-              :key="c.id"
-              class="flex gap-3 py-3 border-b border-neutral-800/50 last:border-0"
-            >
-              <div class="w-8 h-8 rounded-full bg-neutral-600 flex-shrink-0" />
-              <div class="min-w-0 flex-1">
-                <div class="text-sm">
-                  <span class="font-semibold text-white">{{ c.user_nickname }}</span>
-                  <span class="text-neutral-300">{{ c.comment }}</span>
+            <template v-for="c in comments" :key="c.id">
+              <div class="flex gap-3 py-3 border-b border-neutral-800/50">
+                <div class="w-8 h-8 rounded-full bg-neutral-600 flex-shrink-0" />
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm">
+                    <span class="font-semibold text-white">{{ c.user_nickname }}</span>
+                    <span class="text-neutral-300">{{ c.comment }}</span>
+                  </div>
+                  <div class="flex items-center gap-3 mt-1 text-xs text-neutral-500">
+                    <span>9시간</span>
+                    <button
+                      type="button"
+                      class="hover:underline"
+                      @click="emit('toggleCommentLike', c.id)"
+                    >
+                      좋아요 {{ displayLikeCount(c) }}개
+                    </button>
+                    <button
+                      type="button"
+                      class="hover:underline"
+                      @click="startReply(c.id)"
+                    >
+                      답글 달기
+                    </button>
+                  </div>
+                  <!-- 대댓글 -->
+                  <div v-if="(c.reply?.length ?? 0) > 0" class="mt-2 pl-4 border-l border-neutral-700 space-y-2">
+                    <div
+                      v-for="r in (c.reply ?? [])"
+                      :key="r.id"
+                      class="flex gap-2 py-1.5"
+                    >
+                      <div class="w-6 h-6 rounded-full bg-neutral-600 flex-shrink-0" />
+                      <div class="min-w-0 flex-1">
+                        <div class="text-sm">
+                          <span class="font-semibold text-white">{{ r.user_nickname }}</span>
+                          <span class="text-neutral-300">{{ r.comment }}</span>
+                        </div>
+                        <div class="flex items-center gap-3 mt-0.5 text-xs text-neutral-500">
+                          <span>9시간</span>
+                          <button
+                            type="button"
+                            class="hover:underline"
+                            @click="emit('toggleCommentLike', r.id)"
+                          >
+                            좋아요 {{ displayLikeCount(r) }}개
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        class="self-start text-neutral-400 hover:text-white shrink-0"
+                        @click="emit('toggleCommentLike', r.id)"
+                      >
+                        <i
+                          :class="isLiked(r) ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'"
+                          class="text-sm"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <!-- 답글 입력 (해당 댓글에 대댓글 작성 시) -->
+                  <div v-if="replyingToId === c.id" class="mt-2 flex items-center gap-2">
+                    <input
+                      v-model="replyText"
+                      type="text"
+                      placeholder="답글 달기..."
+                      class="flex-1 min-w-0 py-1.5 px-2 rounded bg-neutral-700 border border-neutral-600 text-sm text-white placeholder-neutral-500 outline-none"
+                      @keydown.enter.prevent="submitReply"
+                    >
+                    <button
+                      type="button"
+                      class="text-sm text-blue-400 hover:opacity-80"
+                      :disabled="!replyText.trim()"
+                      @click="submitReply"
+                    >
+                      게시
+                    </button>
+                    <button
+                      type="button"
+                      class="text-sm text-neutral-400 hover:text-white"
+                      @click="cancelReply"
+                    >
+                      취소
+                    </button>
+                  </div>
                 </div>
-                <div class="flex items-center gap-3 mt-1 text-xs text-neutral-500">
-                  <span>9시간</span>
-                  <button type="button" class="hover:underline">좋아요 0개</button>
-                  <button type="button" class="hover:underline">답글 달기</button>
-                </div>
+                <button
+                  type="button"
+                  class="self-start shrink-0"
+                  :class="isLiked(c) ? 'text-red-500' : 'text-neutral-400 hover:text-white'"
+                  @click="emit('toggleCommentLike', c.id)"
+                >
+                  <i
+                    :class="isLiked(c) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"
+                    class="text-sm"
+                  />
+                </button>
               </div>
-              <button
-                type="button"
-                class="self-start text-neutral-400 hover:text-white shrink-0"
-              >
-                <i class="fa-regular fa-heart text-sm" />
-              </button>
-            </div>
+            </template>
           </div>
 
-          <!-- 액션 바: FeedCard와 동일 (좋아요·댓글·공유·북마크) -->
+          <!-- 액션 바: Feed와 동일 (좋아요·댓글·공유·북마크), 좋아요 클릭 시 부모에서 반영 -->
           <div class="p-3 shrink-0">
             <section class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <button
                   type="button"
                   class="flex items-center gap-1.5 text-white hover:opacity-70"
+                  aria-label="좋아요"
+                  @click="emit('toggleLike')"
                 >
                   <i
                     :class="liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart'"
                     class="text-[1.4rem]"
-                    aria-label="좋아요"
                   />
                 </button>
                 <button

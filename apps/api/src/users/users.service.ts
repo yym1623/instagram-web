@@ -1,61 +1,39 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { DbUser } from '../types';
+
+/** Supabase Auth(auth.users) 목록 한 건 형태. 프론트 추천/공유 등에 사용 */
+export interface AuthUserLite {
+  id: string;
+  name: string;
+  nickname: string;
+}
 
 @Injectable()
 export class UsersService {
   constructor(private readonly supabase: SupabaseService) {}
 
-  async findAllExcludeMe(name: string): Promise<DbUser[]> {
-    const { data } = await this.supabase
-      .getClient()
-      .from('user')
-      .select('id, email, name, nickname, created_at')
-      .neq('name', name);
-    return (data ?? []) as DbUser[];
+  /**
+   * Supabase Authentication → Users (auth.users) 목록을 Admin API로 조회.
+   * service_role 필요. name/nickname은 user_metadata에서 사용.
+   */
+  async listAuthUsers(): Promise<AuthUserLite[]> {
+    const { data, error } = await this.supabase
+      .getAdminClient()
+      .auth.admin.listUsers({ perPage: 1000 });
+    if (error || !data?.users?.length) return [];
+    return data.users.map((u) => {
+      const meta = (u.user_metadata ?? {}) as Record<string, string>;
+      return {
+        id: u.id,
+        name: meta.name ?? u.email ?? '',
+        nickname: meta.nickname ?? meta.name ?? u.email ?? '',
+      };
+    });
   }
 
-  async findByEmail(email: string): Promise<DbUser | null> {
-    const { data } = await this.supabase
-      .getClient()
-      .from('user')
-      .select('*')
-      .eq('email', email)
-      .order('email', { ascending: email ? false : true })
-      .limit(1)
-      .single();
-    return data as DbUser | null;
-  }
-
-  async findByName(name: string): Promise<DbUser | null> {
-    const { data } = await this.supabase
-      .getClient()
-      .from('user')
-      .select('*')
-      .eq('name', name)
-      .single();
-    return data as DbUser | null;
-  }
-
-  async getUsersOrderedByEmail(email: string): Promise<DbUser[]> {
-    const { data } = await this.supabase
-      .getClient()
-      .from('user')
-      .select('*');
-    if (!data?.length) return [];
-    const sorted = [...data].sort((a, b) =>
-      (a as { email: string }).email === email ? -1 : (b as { email: string }).email === email ? 1 : 0,
-    );
-    return sorted as DbUser[];
-  }
-
-  async getNameByEmail(email: string): Promise<string | null> {
-    const { data } = await this.supabase
-      .getClient()
-      .from('user')
-      .select('name')
-      .eq('email', email)
-      .single();
-    return (data as { name: string } | null)?.name ?? null;
+  /** name(유저네임)으로 Auth 유저 한 명 조회. 프로필 페이지 등에 사용 */
+  async getAuthUserByName(name: string): Promise<AuthUserLite | null> {
+    const list = await this.listAuthUsers();
+    return list.find((u) => u.name === name) ?? null;
   }
 }

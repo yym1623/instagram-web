@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useApi } from '~/composables/useApi'
-import { useSocket } from '~/composables/useSocket'
+import { useAuthStore } from '@/stores/auth'
+import { useApi } from '@/app/composables/useApi'
+import { useSocket } from '@/app/composables/useSocket'
 
 const auth = useAuthStore()
 const { post, imageUrl } = useApi()
 
 /** 왼쪽 목록: 팔로우한 사람들 (API: /users/select = 나 제외 유저. 추후 팔로우 목록 API로 교체 가능) */
 const followList = ref<Array<{ id: string; name: string; nickname: string; email?: string }>>([])
-/** 팝업용 전체 회원 (POST /users) */
+/** 팝업용 전체 회원 (Supabase Auth 목록, 나 제외) */
 const allUsers = ref<Array<{ id: string; name: string; nickname: string; email?: string }>>([])
 
 const selectedUser = ref<{ name: string; email: string; id: string } | null>(null)
@@ -34,10 +34,10 @@ async function loadFollowList() {
   followList.value = list ?? []
 }
 
-/** 메시지 보내기 팝업용: 회원 전체 */
+/** 메시지 보내기 팝업용: 회원 전체 (Supabase Auth 목록, 나 제외) */
 async function loadAllUsers() {
-  const list = await post<Array<{ id: string; name: string; nickname: string; email?: string }>>('/users', { email: auth.email })
-  allUsers.value = (list ?? []).filter((u) => u.id !== auth.id)
+  const list = await post<Array<{ id: string; name: string; nickname: string; email?: string }>>('/users/select')
+  allUsers.value = (list ?? []).filter((u) => String(u.id) !== String(auth.id))
 }
 
 const filteredFollowList = computed(() => {

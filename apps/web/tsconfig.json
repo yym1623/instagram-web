@@ -1,18 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"],
     "baseUrl": ".",
-    "paths": {
-      "~/*": ["./app/*"],
-      "~~/*": ["./app/*"]
-    }
+    "paths": { "@/*": ["./*"] }
   },
-  "files": [],
-  "references": [
-    { "path": "./.nuxt/tsconfig.app.json" },
-    { "path": "./.nuxt/tsconfig.server.json" },
-    { "path": "./.nuxt/tsconfig.shared.json" },
-    { "path": "./.nuxt/tsconfig.node.json" }
+  "include": [
+    "app/**/*",
+    "stores/**/*",
+    ".nuxt/nuxt.d.ts",
+    ".nuxt/types/imports.d.ts"
   ]
 }

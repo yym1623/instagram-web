@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
-import type { SessionUser } from '~/types'
-import { useApi } from '~/composables/useApi'
-import { parseSupabaseAuthError } from '~/utils/error'
+import { useCookie } from 'nuxt/app'
+import type { SessionUser } from '@/app/types'
+
+import { useApi } from '@/app/composables/useApi'
+import { useSupabaseClient } from '@/app/composables/useSupabaseClient'
+import { parseSupabaseAuthError } from '@/app/utils/error'
 
 const PROFILE_COOKIE = 'instagram_profile'
 

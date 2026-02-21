@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { VALIDATION, parseSupabaseAuthError } from '~/utils/error'
+import { useAuthStore } from '@/stores/auth'
+import { VALIDATION, parseSupabaseAuthError } from '@/app/utils/error'
 
 definePageMeta({ layout: 'auth' })
 

@@ -14,17 +14,19 @@ type HydrationStrategies = {
 type LazyComponent<T> = DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }> & T
 
 interface _GlobalComponents {
+  Feed: typeof import("../../app/components/Feed.vue")['default']
   Menu: typeof import("../../app/components/Menu.vue")['default']
   ModalsCreateFeed: typeof import("../../app/components/Modals/CreateFeed.vue")['default']
   ModalsCreateStory: typeof import("../../app/components/Modals/CreateStory.vue")['default']
+  ModalsFollowListModal: typeof import("../../app/components/Modals/FollowListModal.vue")['default']
   ModalsLikesModal: typeof import("../../app/components/Modals/LikesModal.vue")['default']
   ModalsMessageSend: typeof import("../../app/components/Modals/MessageSend.vue")['default']
   ModalsPostCommentModal: typeof import("../../app/components/Modals/PostCommentModal.vue")['default']
   ModalsPostSettingModal: typeof import("../../app/components/Modals/PostSettingModal.vue")['default']
   ModalsShareModal: typeof import("../../app/components/Modals/ShareModal.vue")['default']
-  FeedCard: typeof import("../../app/components/feed/FeedCard.vue")['default']
-  FeedRightSidebar: typeof import("../../app/components/feed/RightSidebar.vue")['default']
-  FeedStoriesBar: typeof import("../../app/components/feed/StoriesBar.vue")['default']
+  ModalsStoryViewerModal: typeof import("../../app/components/Modals/StoryViewerModal.vue")['default']
+  Story: typeof import("../../app/components/Story.vue")['default']
+  SubFeed: typeof import("../../app/components/SubFeed.vue")['default']
   NuxtWelcome: typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/welcome.vue")['default']
   NuxtLayout: typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/nuxt-layout")['default']
   NuxtErrorBoundary: typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/nuxt-error-boundary.vue")['default']
@@ -48,17 +50,19 @@ interface _GlobalComponents {
   Html: typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/head/runtime/components")['Html']
   Body: typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/head/runtime/components")['Body']
   NuxtIsland: typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/nuxt-island")['default']
+  LazyFeed: LazyComponent<typeof import("../../app/components/Feed.vue")['default']>
   LazyMenu: LazyComponent<typeof import("../../app/components/Menu.vue")['default']>
   LazyModalsCreateFeed: LazyComponent<typeof import("../../app/components/Modals/CreateFeed.vue")['default']>
   LazyModalsCreateStory: LazyComponent<typeof import("../../app/components/Modals/CreateStory.vue")['default']>
+  LazyModalsFollowListModal: LazyComponent<typeof import("../../app/components/Modals/FollowListModal.vue")['default']>
   LazyModalsLikesModal: LazyComponent<typeof import("../../app/components/Modals/LikesModal.vue")['default']>
   LazyModalsMessageSend: LazyComponent<typeof import("../../app/components/Modals/MessageSend.vue")['default']>
   LazyModalsPostCommentModal: LazyComponent<typeof import("../../app/components/Modals/PostCommentModal.vue")['default']>
   LazyModalsPostSettingModal: LazyComponent<typeof import("../../app/components/Modals/PostSettingModal.vue")['default']>
   LazyModalsShareModal: LazyComponent<typeof import("../../app/components/Modals/ShareModal.vue")['default']>
-  LazyFeedCard: LazyComponent<typeof import("../../app/components/feed/FeedCard.vue")['default']>
-  LazyFeedRightSidebar: LazyComponent<typeof import("../../app/components/feed/RightSidebar.vue")['default']>
-  LazyFeedStoriesBar: LazyComponent<typeof import("../../app/components/feed/StoriesBar.vue")['default']>
+  LazyModalsStoryViewerModal: LazyComponent<typeof import("../../app/components/Modals/StoryViewerModal.vue")['default']>
+  LazyStory: LazyComponent<typeof import("../../app/components/Story.vue")['default']>
+  LazySubFeed: LazyComponent<typeof import("../../app/components/SubFeed.vue")['default']>
   LazyNuxtWelcome: LazyComponent<typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/welcome.vue")['default']>
   LazyNuxtLayout: LazyComponent<typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/nuxt-layout")['default']>
   LazyNuxtErrorBoundary: LazyComponent<typeof import("../../../../node_modules/.pnpm/nuxt@4.3.1_@parcel+watcher@2.5.6_@types+node@22.19.11_@vue+compiler-sfc@3.5.28_cac@6.7._ad4df558ce43f77bb1385800081c9398/node_modules/nuxt/dist/app/components/nuxt-error-boundary.vue")['default']>

@@ -2037,7 +2037,7 @@ const _770YRz4MDZuwk719Fqok6i9Sag0cCOLw4v6rNnq10c = (function(nitro) {
 
 const rootDir = "/Users/yym/Documents/my/projects/instagram/apps/web";
 
-const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[{"rel":"stylesheet","href":"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Lobster&display=swap"}],"style":[],"script":[],"noscript":[],"title":"Instagram"};
+const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[{"rel":"icon","type":"image/svg+xml","href":"/instagram.svg"},{"rel":"stylesheet","href":"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"},{"rel":"stylesheet","href":"https://fonts.googleapis.com/css2?family=Lobster&display=swap"}],"style":[],"script":[],"noscript":[],"title":"Instagram-web"};
 
 const appRootTag = "div";
 

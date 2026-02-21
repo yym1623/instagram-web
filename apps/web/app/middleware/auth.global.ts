@@ -1,4 +1,4 @@
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path.startsWith('/auth')) return
@@ -8,9 +8,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) {
     try {
       const supabase = useSupabaseClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        auth.setUserFromSession(session.user)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        auth.setUserFromSession(user)
         return
       }
     } catch {
@@ -23,9 +23,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (auth.isLoggedIn) return
 
   const supabase = useSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (session?.user) {
-    auth.setUserFromSession(session.user)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    auth.setUserFromSession(user)
     return
   }
 

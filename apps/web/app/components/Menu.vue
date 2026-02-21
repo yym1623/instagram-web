@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useApi } from '~/composables/useApi'
+import { useAuthStore } from '@/stores/auth'
+import { useApi } from '@/app/composables/useApi'
 
 const props = defineProps<{
   isMessagePage?: boolean
@@ -101,14 +101,14 @@ onBeforeUnmount(() => {
   <header :class="`group fixed lg:static left-0 bottom-0 lg:bottom-auto z-[100] w-full ${isMessagePage ? 'lg:w-[78px]' : 'lg:w-[244px]'} bg-app lg:h-screen flex flex-col`">
     <nav class="flex lg:flex-col items-center lg:items-stretch h-14 lg:h-auto lg:py-2 lg:px-0 border-b lg:border-b-0 border-neutral-200 dark:border-neutral-800 lg:flex-1 lg:justify-between overflow-hidden">
       <!-- 로고: 아이콘 고정, 텍스트는 호버 시 옆으로 -->
-      <button
-        type="button"
+      <NuxtLink
+        to="/"
         class="flex items-center justify-center w-full lg:w-auto lg:justify-start px-4 lg:pl-5 lg:pr-0 py-3 lg:py-3 my-1 lg:my-1 mx-2 lg:mx-2 text-black dark:text-white hover:opacity-90"
       >
         <span class="flex items-center justify-center w-6 h-6 shrink-0">
           <i class="fa-brands fa-instagram text-[1.7rem]" />
         </span>
-      </button>
+      </NuxtLink>
 
       <div class="flex lg:flex-col flex-1 lg:flex-none lg:items-stretch lg:w-full lg:-mt-4">
         <button

@@ -1,1 +1,0 @@
-import{_ as t,o as a,c,a as e,a8 as o}from"./qrGIMbRh.js";const n={},r={class:"min-h-screen bg-app flex items-center justify-center"},l={class:"max-w-[460px] w-full px-4"},_={class:"max-w-[350px] w-full mx-auto"};function i(s,d){return a(),c("div",r,[e("main",l,[e("div",_,[o(s.$slots,"default")])])])}const m=t(n,[["render",i]]);export{m as default};

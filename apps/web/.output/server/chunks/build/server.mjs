@@ -424,31 +424,31 @@ const __nuxt_page_meta$1 = { layout: "auth" };
 const __nuxt_page_meta = { layout: "auth" };
 const _routes = [
   {
-    name: "id",
-    path: "/:id()",
-    component: () => import('./_id_-zLYOLNHe.mjs')
-  },
-  {
     name: "index",
     path: "/",
-    component: () => import('./index-Dq3ckFRH.mjs')
+    component: () => import('./index-BO_OzH-n.mjs')
   },
   {
     name: "message",
     path: "/message",
-    component: () => import('./message-DQymduXp.mjs')
+    component: () => import('./message-sP4d7UI7.mjs')
+  },
+  {
+    name: "user-id",
+    path: "/user/:id()",
+    component: () => import('./_id_-SilP0SJS.mjs')
   },
   {
     name: "auth",
     path: "/auth",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./index-BXoxfxK3.mjs')
+    component: () => import('./index-BPKliywy.mjs')
   },
   {
     name: "auth-signup",
     path: "/auth/signup",
     meta: __nuxt_page_meta$2 || {},
-    component: () => import('./signup-CxEbyXep.mjs')
+    component: () => import('./signup-BLlWw69v.mjs')
   },
   {
     name: "auth-message",
@@ -591,7 +591,7 @@ function useApi() {
         ...options.headers
       }
     });
-    if (res.status === 401 && !path.includes("/auth/login")) {
+    if (res.status === 401 && !path.includes("/auth")) {
       const auth = useAuthStore();
       await auth.logout();
       await navigateTo("/auth");
@@ -599,7 +599,16 @@ function useApi() {
     }
     if (!res.ok) throw new Error(await res.text());
     const text = await res.text();
-    return text ? JSON.parse(text) : {};
+    if (!text) return {};
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      throw new Error(`API가 JSON이 아닌 응답을 반환했습니다. (${url})`);
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(`API 응답 파싱 실패: JSON이 아닙니다. (${url})`);
+    }
   }
   return {
     get: (path) => request(path, { method: "GET" }),
@@ -1123,7 +1132,7 @@ const plugins = [
 ];
 const layouts = {
   auth: defineAsyncComponent(() => import('./auth-CYMmE5TV.mjs').then((m) => m.default || m)),
-  default: defineAsyncComponent(() => import('./default-CYBuLDaZ.mjs').then((m) => m.default || m))
+  default: defineAsyncComponent(() => import('./default-CwEswq4n.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({
@@ -1464,5 +1473,5 @@ let entry;
 }
 const entry_default = ((ssrContext) => entry(ssrContext));
 
-export { VALIDATION as V, _export_sfc as _, useRoute as a, useApi as b, useAuthStore as c, useRouter as d, entry_default as default, encodeRoutePath as e, useRuntimeConfig as f, nuxtLinkDefaults as g, navigateTo as n, resolveRouteObject as r, useNuxtApp as u };
+export { VALIDATION as V, _export_sfc as _, useApi as a, useAuthStore as b, useRoute as c, useRouter as d, entry_default as default, encodeRoutePath as e, useRuntimeConfig as f, nuxtLinkDefaults as g, navigateTo as n, resolveRouteObject as r, useNuxtApp as u };
 //# sourceMappingURL=server.mjs.map

@@ -9,7 +9,7 @@ export class AuthService {
   /**
    * Supabase Auth 기반 로그인 (email + password).
    * - supabase.auth.signInWithPassword 로 인증
-   * - auth.users 와 동기화된 public.user 프로필에서 name / nickname 조회
+   * - name/nickname은 auth user_metadata에서 사용
    */
   async login(
     email: string,
@@ -31,19 +31,13 @@ export class AuthService {
 
     const authUser = data.user;
     const session = data.session;
-
-    // 프로필 정보는 public.user 테이블에서 관리 (없으면 supabase user_metadata 로 fallback)
-    const { data: profile } = await client
-      .from('user')
-      .select('id, email, name, nickname')
-      .eq('id', authUser.id)
-      .single();
+    const meta = (authUser.user_metadata ?? {}) as Record<string, string>;
 
     const sessionUser: SessionUser = {
       id: authUser.id,
       email: authUser.email ?? email,
-      name: profile?.name ?? (authUser.user_metadata as any)?.name ?? '',
-      nickname: profile?.nickname ?? (authUser.user_metadata as any)?.nickname ?? '',
+      name: meta.name ?? '',
+      nickname: meta.nickname ?? meta.name ?? '',
     };
 
     return {
@@ -56,14 +50,10 @@ export class AuthService {
 
   /**
    * Supabase Auth 기반 회원가입.
-   * - auth.signUp 으로 계정 생성
-   * - public.user 테이블에 프로필 동기화
+   * - auth.signUp 으로 계정 생성, user_metadata에 name/nickname 저장
    */
   async register(body: { email: string; pw: string; name: string; nickname: string }) {
     const client = this.supabase.getClient();
-
-    // 회원가입 요청 payload 로그
-    console.log('[AuthService.register] incoming body:', body);
 
     const { data, error } = await client.auth.signUp({
       email: body.email,
@@ -77,35 +67,22 @@ export class AuthService {
     });
 
     if (error) {
-      console.error('[AuthService.register] supabase.auth.signUp error:', error);
       return { success: false, message: error.message };
     }
 
-    const authUser = data.user;
-    if (!authUser) {
+    if (!data.user) {
       return { success: false, message: '회원가입에 실패했습니다' };
     }
 
-    // public.user 프로필 upsert (auth.users.id 를 그대로 사용)
-    const { data: profile, error: profileError } = await client
-      .from('user')
-      .upsert(
-        {
-          id: authUser.id,
-          email: authUser.email ?? body.email,
-          name: body.name,
-          nickname: body.nickname,
-        },
-        { onConflict: 'id' },
-      )
-      .select('id, email, name, nickname')
-      .single();
-
-    if (profileError) {
-      console.error('[AuthService.register] profile upsert error:', profileError);
-      return { success: false, message: profileError.message };
-    }
-
-    return { success: true, user: profile };
+    const meta = (data.user.user_metadata ?? {}) as Record<string, string>;
+    return {
+      success: true,
+      user: {
+        id: data.user.id,
+        email: data.user.email ?? body.email,
+        name: meta.name ?? body.name,
+        nickname: meta.nickname ?? body.nickname,
+      },
+    };
   }
 }

@@ -1,4 +1,7 @@
-# Logs
+# ----- 루트 -----
+node_modules
+dist
+dist-ssr
 logs
 *.log
 npm-debug.log*
@@ -6,13 +9,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
 *.local
 
-# Editor directories and files
+# Editor / OS
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,6 +22,15 @@ dist-ssr
 *.sln
 *.sw?
 
+# ----- 프론트 (apps/web) -----
+apps/web/node_modules
+apps/web/.nuxt
+apps/web/.output
+apps/web/.env
+apps/web/.env.*
 
-# env
-.env.development
+# ----- 백 (apps/api) -----
+apps/api/node_modules
+apps/api/dist
+apps/api/.env
+apps/api/.env.*

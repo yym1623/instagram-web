@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useApi } from '~/composables/useApi'
-import { useAuthStore } from '~/stores/auth'
+import { useApi } from '@/app/composables/useApi'
+import { useAuthStore } from '@/stores/auth'
 
 interface CommentItem {
   id: string
@@ -58,11 +58,9 @@ const isOwnPost = computed(() => {
   return post.name === auth.name
 })
 
-const hasImages = computed(
-  () => (props.post.img_cnt ?? 0) > 0 && (props.post.img ?? '').length > 0,
-)
-const isSingleImage = computed(() => (props.post.img_cnt ?? 0) === 1)
 const imageList = computed(() => (props.post.img ?? '').split(',').filter(Boolean))
+const hasImages = computed(() => imageList.value.length > 0)
+const isSingleImage = computed(() => imageList.value.length === 1)
 const showSwipeUi = computed(() => imageList.value.length > 1)
 
 const imageIndex = ref(0)

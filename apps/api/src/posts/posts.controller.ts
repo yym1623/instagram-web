@@ -3,7 +3,6 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { PostsService } from './posts.service';
-import { UsersService } from '../users/users.service';
 
 const storage = diskStorage({
   destination: './public/uploads',
@@ -12,10 +11,7 @@ const storage = diskStorage({
 
 @Controller('posts')
 export class PostsController {
-  constructor(
-    private readonly posts: PostsService,
-    private readonly users: UsersService,
-  ) {}
+  constructor(private readonly posts: PostsService) {}
 
   @Get('feed')
   getFeed() {
@@ -39,15 +35,14 @@ export class PostsController {
     }),
   )
   async create(
-    @Body() body: { email: string; name: string; nickname: string; write: string },
+    @Body() body: { user_id: string; email: string; name: string; nickname: string; write: string },
     @UploadedFiles() files: { myfile?: Express.Multer.File[] },
   ) {
     const filesList = files?.myfile ?? [];
     const imgPaths = filesList.map((f) => '/public/uploads/' + f.filename);
     const img = filesList.length === 1 ? imgPaths[0]! : imgPaths;
     const imgCnt = filesList.length;
-    const user = await this.users.findByEmail(body.email);
-    if (!user?.id) throw new Error('User not found');
+    if (!body.user_id) throw new Error('user_id required');
     return this.posts.create({
       email: body.email,
       name: body.name,
@@ -55,7 +50,7 @@ export class PostsController {
       make_write: body.write ?? '',
       img: Array.isArray(img) ? img : [img],
       img_cnt: imgCnt,
-      user_id: user.id,
+      user_id: body.user_id,
     });
   }
 
