@@ -12,8 +12,10 @@ const props = withDefaults(
     open: boolean
     storyList?: StoryViewerItem[]
     initialIndex?: number
+    /** true면 하단 답장(댓글) 영역 숨김 (유저 프로필 하이라이트에서 열 때 등) */
+    hideReply?: boolean
   }>(),
-  { storyList: () => [], initialIndex: 0 },
+  { storyList: () => [], initialIndex: 0, hideReply: false },
 )
 
 const emit = defineEmits<{
@@ -227,8 +229,8 @@ onBeforeUnmount(stopTimer)
             >
           </div>
 
-          <!-- 하단: 답장 입력 -->
-          <div class="absolute bottom-0 left-0 right-0 p-3 z-10">
+          <!-- 하단: 답장 입력 (hideReply 시 숨김) -->
+          <div v-if="!hideReply" class="absolute bottom-0 left-0 right-0 p-3 z-10">
             <div class="flex items-center gap-2 rounded-full bg-white/10 border border-white/20 px-4 py-2">
               <input
                 type="text"

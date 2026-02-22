@@ -93,6 +93,14 @@ const followersList = computed(() => {
   return (me?.followers ?? []) as { id: string; name: string; nickname: string }[]
 })
 
+/** 회원님을 위한 추천 전체 목록 (모두 보기 모달용). 나 제외 */
+const recommendedListFull = computed(() =>
+  mockUsers.value
+    .filter((m) => String(m.id) !== String(auth.id))
+    .map((m) => ({ id: m.id, name: m.name, nickname: m.nickname })),
+)
+const recommendedListModalOpen = ref(false)
+
 /** 피드: 나 + 팔로우한 유저 + 광고 2개. 순서는 랜덤 (광고 끼워넣기) */
 const mockFeed = computed<FeedResponse>(() => {
   const list = mockUsers.value.filter(
@@ -328,6 +336,7 @@ onMounted(() => {
         @open-profile="myPage"
         @follow="onFollow"
         @unfollow="onUnfollow"
+        @show-all="recommendedListModalOpen = true"
       />
     </div>
 
@@ -353,6 +362,15 @@ onMounted(() => {
       @close="shareModalOpen = false"
       @open-profile="myPage"
       @select-user="onShareSelectUser"
+    />
+
+    <!-- 회원님을 위한 추천 전체 (모두 보기) -->
+    <ModalsFollowListModal
+      :open="recommendedListModalOpen"
+      title="회원님을 위한 추천"
+      :list="recommendedListFull"
+      @close="recommendedListModalOpen = false"
+      @open-profile="(n) => { myPage(n); recommendedListModalOpen = false }"
     />
 
     <!-- 댓글 모달 (왼쪽 이미지, 오른쪽 댓글+입력) -->

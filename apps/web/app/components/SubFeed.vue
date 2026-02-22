@@ -18,6 +18,7 @@ const emit = defineEmits<{
   (e: 'openProfile', name: string): void
   (e: 'follow', user: UserLite): void
   (e: 'unfollow', user: UserLite): void
+  (e: 'showAll'): void
 }>()
 
 const auth = useAuthStore()
@@ -128,7 +129,11 @@ function goCurrentProfile() {
     <section class="mt-2">
       <div class="flex justify-between items-center py-2">
         <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400">회원님을 위한 추천</span>
-        <button type="button" class="text-xs font-semibold text-black dark:text-white hover:opacity-80">
+        <button
+          type="button"
+          class="text-xs font-semibold text-black dark:text-white hover:opacity-80"
+          @click="emit('showAll')"
+        >
           모두 보기
         </button>
       </div>

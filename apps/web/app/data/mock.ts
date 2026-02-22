@@ -21,6 +21,12 @@ export interface MockStoryInner {
   img?: string[]
 }
 
+/** 스토리 하이라이트 한 건: 1단계에서 만든 이름 + 2단계에서 고른 이미지 배열 */
+export interface MockStoryHighlightItem {
+  name: string
+  img: string[]
+}
+
 /** 공통: id, name, nickname. feed / story / following·followers */
 export interface MockDataItem {
   id: string
@@ -28,6 +34,8 @@ export interface MockDataItem {
   nickname: string
   feed: MockFeedInner | Record<string, unknown>
   story: Record<string, unknown>
+  /** 스토리 하이라이트: 이름별로 묶은 이미지 배열 (1단계 이름 → 2단계에서 선택한 스토리들) */
+  storyHighlight?: MockStoryHighlightItem[]
   /** 팔로워: 내가 팔로우한 사람 (내가 팔로우 버튼 누르면 여기 추가). 스토리·피드는 여기 있는 사람만 노출 */
   following?: UserLite[]
   /** 팔로윙: 나를 팔로우한 사람 (다른 사람이 나 팔로우하면 여기 추가). SubFeed 상단 "X 님이 팔로워했습니다" */
@@ -90,6 +98,10 @@ export const mockData: MockDataItem[] = [
       img: ['/placeholder.jpg'],
     },
     story: { img: ['/placeholder.jpg'] },
+    storyHighlight: [
+      { name: '연습', img: ['/placeholder.jpg'] },
+      { name: '일상', img: ['/placeholder.jpg'] },
+    ],
   },
   {
     id: 'u2',

@@ -26,6 +26,9 @@ const listToShow = computed(() => {
       (u.nickname || '').toLowerCase().includes(q),
   )
 })
+
+/** 데이터 없을 때 메시지: 타이틀 기준 "팔로워가 없습니다" 등 */
+const emptyMessage = computed(() => `${props.title}이(가) 없습니다`)
 </script>
 
 <template>
@@ -60,26 +63,35 @@ const listToShow = computed(() => {
             >
           </div>
         </div>
-        <!-- 리스트 -->
-        <div class="flex-1 overflow-y-auto min-h-0">
-          <button
-            v-for="u in listToShow"
-            :key="u.id"
-            type="button"
-            class="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800/50 transition-colors text-left"
-            @click="emit('openProfile', u.name)"
-          >
-            <div class="w-10 h-10 rounded-full bg-neutral-600 flex-shrink-0 overflow-hidden">
-              <!-- avatar placeholder; could use imageUrl if user had img -->
+        <!-- 리스트: min-height 400px, 이 영역만 스크롤. 400 넘으면 스크롤 -->
+        <div class="flex-1 min-h-[400px] overflow-y-auto min-w-0 w-full">
+          <template v-if="listToShow.length === 0">
+            <div class="min-h-[400px] w-full flex items-center justify-center px-4">
+              <p class="text-neutral-400 text-sm text-center">
+                {{ emptyMessage }}
+              </p>
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-semibold text-white truncate">{{ u.name }}</div>
-              <div v-if="u.nickname" class="text-xs text-neutral-400 truncate">{{ u.nickname }}</div>
-            </div>
-            <span class="px-4 py-1.5 rounded-lg bg-neutral-700 text-white text-sm font-medium shrink-0">
-              팔로잉
-            </span>
-          </button>
+          </template>
+          <template v-else>
+            <button
+              v-for="u in listToShow"
+              :key="u.id"
+              type="button"
+              class="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800/50 transition-colors text-left"
+              @click="emit('openProfile', u.name)"
+            >
+              <div class="w-10 h-10 rounded-full bg-neutral-600 flex-shrink-0 overflow-hidden">
+                <!-- avatar placeholder; could use imageUrl if user had img -->
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-sm font-semibold text-white truncate">{{ u.name }}</div>
+                <div v-if="u.nickname" class="text-xs text-neutral-400 truncate">{{ u.nickname }}</div>
+              </div>
+              <span class="px-4 py-1.5 rounded-lg bg-neutral-700 text-white text-sm font-medium shrink-0">
+                팔로잉
+              </span>
+            </button>
+          </template>
         </div>
       </div>
     </div>
